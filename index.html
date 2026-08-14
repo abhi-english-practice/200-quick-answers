@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Conversation Writing Dossier</title>
+<style>
+:root {
+  --paper:#f2efe8;
+  --card:#ffffff;
+  --ink:#202a35;
+  --muted:#6d7782;
+  --line:#d9dee4;
+  --navy:#293e50;
+  --soft:#edf2f5;
+  --ok:#315b49;
+  --danger:#8d3a3a;
+  --shadow:0 12px 32px rgba(27,39,51,.07);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:Arial,"Helvetica Neue",sans-serif}
+button,input,textarea{font:inherit}
+button{cursor:pointer}
+.topbar{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.96);border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}
+.topinner{max-width:980px;margin:auto;padding:11px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.mark{width:38px;height:38px;border:1.7px solid var(--navy);border-radius:8px;display:grid;place-items:center;font-weight:800;color:var(--navy)}
+.titlebox b{display:block;font-size:14px;letter-spacing:.08em}
+.titlebox small{display:block;color:var(--muted);margin-top:3px;font-size:11px}
+.stats{margin-left:auto;display:flex;gap:7px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 9px;font-size:12px;white-space:nowrap}
+.wrap{max-width:980px;margin:auto;padding:16px 14px 48px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow)}
+.setup{padding:17px}
+.setupgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#52606c;font-weight:700;margin-bottom:6px}
+.field input{width:100%;border:1px solid #cfd6dd;border-radius:8px;padding:11px 12px;outline:none}
+.field input:focus,.answer:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(41,62,80,.08)}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.btn{border:1px solid #c8d0d7;background:#fff;color:#273744;border-radius:8px;padding:9px 12px;font-weight:700}
+.btn.primary{background:var(--navy);color:#fff;border-color:var(--navy)}
+.btn.danger{color:var(--danger);border-color:#dfc5c5;background:#fffafa}
+.navpanel{margin-top:14px;padding:12px}
+.rangebar{display:flex;gap:7px;flex-wrap:wrap}
+.rangebtn{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 10px;font-size:12px;font-weight:700}
+.rangebtn.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+.qgrid{display:grid;grid-template-columns:repeat(20,1fr);gap:5px;margin-top:10px}
+.qdot{aspect-ratio:1;border:1px solid var(--line);border-radius:6px;background:#fff;font-size:10px;font-weight:700;color:#52606c;padding:0}
+.qdot.done{background:#e9f0f4;border-color:#9babb7;color:#263946}
+.qdot.active{outline:2px solid var(--navy);outline-offset:1px}
+.workspace{margin-top:14px;padding:19px}
+.qmeta{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.qno{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}
+.qrange{font-size:11px;color:var(--muted)}
+.question{font-size:24px;line-height:1.4;margin:18px 0 16px;font-weight:700}
+.answerlabel{font-size:11px;text-transform:uppercase;letter-spacing:.07em;font-weight:700;color:#52606c;margin-bottom:7px}
+.answer{width:100%;min-height:120px;resize:vertical;border:1px solid #cfd6dd;border-radius:10px;padding:13px;outline:none;font-size:17px;line-height:1.55}
+.help{font-size:11px;color:var(--muted);margin-top:7px;line-height:1.45}
+.actions{display:grid;grid-template-columns:auto 1fr auto;gap:8px;margin-top:13px;align-items:center}
+.status{text-align:center;font-size:12px;color:var(--muted)}
+.postsubmit{display:none;margin-top:14px}
+.postsubmit.open{display:block}
+.summary{padding:19px}
+.summaryhead{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;flex-wrap:wrap}
+.summaryhead h2{margin:0 0 7px;font-size:22px}
+.meta{font-size:12px;line-height:1.65;color:#45525d}
+.summarymetrics{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px 0}
+.metric{border:1px solid var(--line);border-radius:9px;padding:11px;background:#fafbfc}
+.metric b{display:block;font-size:19px}
+.metric span{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.reportlist{margin-top:12px;display:grid;gap:10px}
+.reportitem{border:1px solid var(--line);border-radius:9px;padding:12px;break-inside:avoid;background:#fff}
+.reportq{font-weight:700;line-height:1.45}
+.label{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700;margin-top:10px}
+.studentans,.hintans{margin-top:4px;line-height:1.5;white-space:pre-wrap}
+.studentans.blank{color:#9a4d4d;font-style:italic}
+.hintans{background:#f3f6f8;border-left:3px solid #8ea2b1;padding:8px 10px;border-radius:4px}
+.locknote{font-size:12px;color:var(--muted);margin-top:10px}
+.hidden{display:none!important}
+@media(max-width:700px){
+  .setupgrid{grid-template-columns:1fr}
+  .qgrid{grid-template-columns:repeat(10,1fr)}
+  .question{font-size:21px}
+  .summarymetrics{grid-template-columns:1fr 1fr}
+  .actions{grid-template-columns:1fr 1fr}
+  .status{grid-column:1/-1;order:-1}
+  .stats{width:100%;margin-left:0}
+}
+@media print{
+  @page{size:A4 portrait;margin:10mm}
+  body{background:#fff;color:#000}
+  .topbar,.setup,.navpanel,.workspace,.print-hide{display:none!important}
+  .wrap{max-width:none;padding:0;margin:0}
+  .postsubmit{display:block!important;margin:0}
+  .summary{box-shadow:none;border:0;padding:0}
+  .summaryhead h2{font-size:16pt}
+  .summarymetrics{grid-template-columns:repeat(4,1fr);margin:8px 0 12px}
+  .metric{padding:7px;background:#fff}
+  .metric b{font-size:14pt}
+  .reportlist{gap:6px}
+  .reportitem{padding:8px;border-color:#bbb}
+  .reportq{font-size:9pt}
+  .label{font-size:7pt;margin-top:6px}
+  .studentans,.hintans{font-size:8.5pt;line-height:1.35}
+  .hintans{padding:5px 7px;background:#fff;border-left:2px solid #777}
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="topinner">
+    <div class="mark">DW</div>
+    <div class="titlebox"><b>CONVERSATION WRITING DOSSIER</b><small>200 open-response prompts</small></div>
+    <div class="stats">
+      <div class="chip" id="answeredChip">Answered 0/200</div>
+      <div class="chip" id="timerChip">00:00</div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="setup card">
+    <div class="setupgrid">
+      <div class="field"><label for="studentName">Student name *</label><input id="studentName" placeholder="Full name"></div>
+      <div class="field"><label for="studentClass">Class / Group</label><input id="studentClass" placeholder="Optional"></div>
+    </div>
+    <div class="toolbar">
+      <button class="btn" id="saveBtn">Save progress</button>
+      <button class="btn" id="firstBlankBtn">First unanswered</button>
+      <button class="btn primary" id="submitBtn">Submit now</button>
+      <button class="btn danger" id="resetBtn">Reset</button>
+    </div>
+  </section>
+
+  <section class="navpanel card">
+    <div class="rangebar" id="rangebar"></div>
+    <div class="qgrid" id="qgrid"></div>
+  </section>
+
+  <section class="workspace card" id="workspace">
+    <div class="qmeta"><span class="qno" id="qno"></span><span class="qrange" id="qrange"></span></div>
+    <div class="question" id="question"></div>
+    <div class="answerlabel">Your response</div>
+    <textarea class="answer" id="answer" placeholder="Write your own answer in English."></textarea>
+    <div class="help">Your answer does not need to match the sample. Write a natural answer that is true for you.</div>
+    <div class="actions">
+      <button class="btn" id="prevBtn">Previous</button>
+      <div class="status" id="status"></div>
+      <button class="btn primary" id="nextBtn">Next</button>
+    </div>
+  </section>
+
+  <section class="postsubmit" id="postsubmit">
+    <div class="summary card" id="summary">
+      <div class="summaryhead">
+        <div>
+          <h2>Submission Summary</h2>
+          <div class="meta" id="reportMeta"></div>
+        </div>
+        <div class="toolbar print-hide" style="margin-top:0">
+          <button class="btn primary" id="printBtn">Export PDF</button>
+          <button class="btn" id="backBtn">Back to answers</button>
+        </div>
+      </div>
+      <div class="summarymetrics">
+        <div class="metric"><b id="mAnswered">0</b><span>Answered</span></div>
+        <div class="metric"><b id="mBlank">200</b><span>Blank</span></div>
+        <div class="metric"><b id="mTime">00:00</b><span>Total time</span></div>
+        <div class="metric"><b>200</b><span>Total prompts</span></div>
+      </div>
+      <div class="locknote">Suggested responses are shown only after submission and are for reference, not as the only correct answers.</div>
+      <div class="reportlist" id="reportlist"></div>
+    </div>
+  </section>
+</main>
+
+<script>
+const ITEMS = [{"n": 1, "q": "How are you?", "hint": "I’m fine, thank you."}, {"n": 2, "q": "What’s your name?", "hint": "My name is Alex."}, {"n": 3, "q": "Where are you from?", "hint": "I’m from India."}, {"n": 4, "q": "Where do you live?", "hint": "I live in Delhi."}, {"n": 5, "q": "How old are you?", "hint": "I’m 25 years old."}, {"n": 6, "q": "What do you do?", "hint": "I’m a student."}, {"n": 7, "q": "Are you busy?", "hint": "No, I’m free."}, {"n": 8, "q": "What time is it?", "hint": "It’s 10 o’clock."}, {"n": 9, "q": "Is this your phone?", "hint": "Yes, it is."}, {"n": 10, "q": "Can you help me?", "hint": "Of course."}, {"n": 11, "q": "Do you speak English?", "hint": "Yes, I do."}, {"n": 12, "q": "What are you doing?", "hint": "I’m reading a book."}, {"n": 13, "q": "Are you hungry?", "hint": "Yes, I am."}, {"n": 14, "q": "Would you like some tea?", "hint": "Yes, please."}, {"n": 15, "q": "Do you like coffee?", "hint": "Yes, I love coffee."}, {"n": 16, "q": "What’s your favorite food?", "hint": "My favorite food is pizza."}, {"n": 17, "q": "Do you like music?", "hint": "Yes, I do."}, {"n": 18, "q": "What kind of music do you like?", "hint": "I like pop music."}, {"n": 19, "q": "Do you have any hobbies?", "hint": "Yes, I enjoy painting."}, {"n": 20, "q": "What are you looking for?", "hint": "I’m looking for my keys."}, {"n": 21, "q": "Where is the bathroom?", "hint": "It’s over there."}, {"n": 22, "q": "Can I sit here?", "hint": "Yes, you can."}, {"n": 23, "q": "May I come in?", "hint": "Yes, please come in."}, {"n": 24, "q": "What day is it today?", "hint": "Today is Monday."}, {"n": 25, "q": "What’s the date today?", "hint": "It’s August 2nd."}, {"n": 26, "q": "Is it raining outside?", "hint": "Yes, it is."}, {"n": 27, "q": "What’s the weather like?", "hint": "It’s sunny today."}, {"n": 28, "q": "Are you ready?", "hint": "Yes, I’m ready."}, {"n": 29, "q": "Can you repeat that?", "hint": "Sure, I’ll repeat it."}, {"n": 30, "q": "What does this word mean?", "hint": "It means “very happy.”"}, {"n": 31, "q": "How was your day?", "hint": "It was great."}, {"n": 32, "q": "Did you sleep well?", "hint": "Yes, I slept well."}, {"n": 33, "q": "What did you eat for breakfast?", "hint": "I had bread and eggs."}, {"n": 34, "q": "Where are you going?", "hint": "I’m going to school."}, {"n": 35, "q": "When will you come back?", "hint": "I’ll be back at 6 p.m."}, {"n": 36, "q": "Who is your best friend?", "hint": "My best friend is Sam."}, {"n": 37, "q": "Do you have any brothers or sisters?", "hint": "Yes, I have one sister."}, {"n": 38, "q": "What is your father’s job?", "hint": "He’s a teacher."}, {"n": 39, "q": "What is your mother’s job?", "hint": "She’s a doctor."}, {"n": 40, "q": "Can I borrow your pen?", "hint": "Sure, here you go."}, {"n": 41, "q": "How much is this?", "hint": "It’s ten dollars."}, {"n": 42, "q": "Do you need anything?", "hint": "No, thank you."}, {"n": 43, "q": "Are you okay?", "hint": "Yes, I’m fine."}, {"n": 44, "q": "What happened?", "hint": "I missed the bus."}, {"n": 45, "q": "Why are you late?", "hint": "Because of traffic."}, {"n": 46, "q": "Can we meet tomorrow?", "hint": "Yes, let’s meet tomorrow."}, {"n": 47, "q": "What are your plans for today?", "hint": "I’m going shopping."}, {"n": 48, "q": "Have you finished your homework?", "hint": "Yes, I have."}, {"n": 49, "q": "Do you need my help?", "hint": "Yes, please help me."}, {"n": 50, "q": "See you later!", "hint": "See you. Have a nice day!"}, {"n": 51, "q": "What are you thinking about?", "hint": "I’m thinking about my future."}, {"n": 52, "q": "Where do you work?", "hint": "I work in an office."}, {"n": 53, "q": "What time do you wake up?", "hint": "I wake up at 6 a.m."}, {"n": 54, "q": "Do you exercise every day?", "hint": "Yes, I do."}, {"n": 55, "q": "What’s your favorite color?", "hint": "My favorite color is blue."}, {"n": 56, "q": "Can you drive a car?", "hint": "Yes, I can."}, {"n": 57, "q": "Do you have a pet?", "hint": "Yes, I have a dog."}, {"n": 58, "q": "What’s your favorite movie?", "hint": "My favorite movie is Avatar."}, {"n": 59, "q": "Have you seen this movie?", "hint": "Yes, I have."}, {"n": 60, "q": "Do you like traveling?", "hint": "Yes, I love traveling."}, {"n": 61, "q": "Which country would you like to visit?", "hint": "I’d like to visit Japan."}, {"n": 62, "q": "What’s your favorite season?", "hint": "My favorite season is winter."}, {"n": 63, "q": "Do you like reading books?", "hint": "Yes, I do."}, {"n": 64, "q": "What’s your favorite book?", "hint": "My favorite book is Harry Potter."}, {"n": 65, "q": "Can you swim?", "hint": "Yes, I can."}, {"n": 66, "q": "Are you tired?", "hint": "A little."}, {"n": 67, "q": "What did you do yesterday?", "hint": "I visited my friend."}, {"n": 68, "q": "What are you doing tomorrow?", "hint": "I’m going shopping."}, {"n": 69, "q": "Do you like cooking?", "hint": "Yes, I enjoy cooking."}, {"n": 70, "q": "What’s your favorite drink?", "hint": "Orange juice."}, {"n": 71, "q": "Have you eaten lunch?", "hint": "Yes, I have."}, {"n": 72, "q": "What’s your phone number?", "hint": "It’s 9876543210."}, {"n": 73, "q": "Can I call you later?", "hint": "Sure."}, {"n": 74, "q": "Are you married?", "hint": "No, I’m not."}, {"n": 75, "q": "Do you have children?", "hint": "Yes, I have one child."}, {"n": 76, "q": "What do you usually do on weekends?", "hint": "I spend time with my family."}, {"n": 77, "q": "Do you like watching TV?", "hint": "Yes, sometimes."}, {"n": 78, "q": "What’s your favorite TV show?", "hint": "Friends."}, {"n": 79, "q": "Can you dance?", "hint": "Yes, a little."}, {"n": 80, "q": "Do you like sports?", "hint": "Yes, I do."}, {"n": 81, "q": "What’s your favorite sport?", "hint": "Cricket."}, {"n": 82, "q": "Which team do you support?", "hint": "I support India."}, {"n": 83, "q": "Are you feeling better now?", "hint": "Yes, much better."}, {"n": 84, "q": "What would you like to eat?", "hint": "I’d like some pasta."}, {"n": 85, "q": "Is everything okay?", "hint": "Yes, everything is fine."}, {"n": 86, "q": "Can you wait for me?", "hint": "Sure, no problem."}, {"n": 87, "q": "Do you know the answer?", "hint": "Yes, I do."}, {"n": 88, "q": "How far is the station?", "hint": "It’s about 2 kilometers."}, {"n": 89, "q": "Can you show me the way?", "hint": "Of course."}, {"n": 90, "q": "Is this seat taken?", "hint": "No, it’s free."}, {"n": 91, "q": "What’s your favorite subject?", "hint": "English."}, {"n": 92, "q": "Do you like learning English?", "hint": "Yes, I love it."}, {"n": 93, "q": "How often do you study?", "hint": "Every day."}, {"n": 94, "q": "Can you speak slowly?", "hint": "Certainly."}, {"n": 95, "q": "Do you understand me?", "hint": "Yes, I understand."}, {"n": 96, "q": "What would you like to do now?", "hint": "I’d like to relax."}, {"n": 97, "q": "Are you coming with us?", "hint": "Yes, I am."}, {"n": 98, "q": "When is your birthday?", "hint": "It’s in December."}, {"n": 99, "q": "What’s your dream job?", "hint": "I want to be a software engineer."}, {"n": 100, "q": "Have a great day!", "hint": "Thank you. You too!"}, {"n": 101, "q": "Where are you now?", "hint": "I’m at home."}, {"n": 102, "q": "Who are you waiting for?", "hint": "I’m waiting for my friend."}, {"n": 103, "q": "Can I ask you something?", "hint": "Sure, go ahead."}, {"n": 104, "q": "What’s your favorite fruit?", "hint": "My favorite fruit is mango."}, {"n": 105, "q": "Do you like chocolate?", "hint": "Yes, I do."}, {"n": 106, "q": "Have you had dinner?", "hint": "Yes, I have."}, {"n": 107, "q": "What did you buy?", "hint": "I bought a new shirt."}, {"n": 108, "q": "Where did you buy it?", "hint": "I bought it online."}, {"n": 109, "q": "Is it expensive?", "hint": "No, it’s affordable."}, {"n": 110, "q": "Can you hear me?", "hint": "Yes, I can hear you clearly."}, {"n": 111, "q": "Are you feeling cold?", "hint": "Yes, a little."}, {"n": 112, "q": "Would you like some water?", "hint": "Yes, please."}, {"n": 113, "q": "What are you looking at?", "hint": "I’m looking at the sky."}, {"n": 114, "q": "Do you need more time?", "hint": "Yes, just a few minutes."}, {"n": 115, "q": "Can I open the window?", "hint": "Yes, please do."}, {"n": 116, "q": "Is this your first time here?", "hint": "Yes, it is."}, {"n": 117, "q": "Have you been here before?", "hint": "No, never."}, {"n": 118, "q": "Where did you meet him?", "hint": "I met him at school."}, {"n": 119, "q": "How long have you lived here?", "hint": "For five years."}, {"n": 120, "q": "What’s your favorite restaurant?", "hint": "The Italian Corner."}, {"n": 121, "q": "Do you like spicy food?", "hint": "Yes, I love it."}, {"n": 122, "q": "Can you cook rice?", "hint": "Yes, I can."}, {"n": 123, "q": "What’s your favorite dessert?", "hint": "Ice cream."}, {"n": 124, "q": "Are you afraid of dogs?", "hint": "No, I’m not."}, {"n": 125, "q": "Do you enjoy hiking?", "hint": "Yes, it’s fun."}, {"n": 126, "q": "What’s your favorite holiday?", "hint": "Diwali."}, {"n": 127, "q": "How do you go to work?", "hint": "I go by bus."}, {"n": 128, "q": "Do you have a bicycle?", "hint": "Yes, I do."}, {"n": 129, "q": "Can you ride a bike?", "hint": "Yes, I can."}, {"n": 130, "q": "What time does the train leave?", "hint": "At 8:30 a.m."}, {"n": 131, "q": "Have you booked the tickets?", "hint": "Yes, I have."}, {"n": 132, "q": "Where are we going?", "hint": "We’re going to the park."}, {"n": 133, "q": "Is it nearby?", "hint": "Yes, it’s very close."}, {"n": 134, "q": "Shall we start?", "hint": "Yes, let’s go."}, {"n": 135, "q": "Do you like this place?", "hint": "Yes, it’s beautiful."}, {"n": 136, "q": "Can you take a picture?", "hint": "Sure."}, {"n": 137, "q": "What are you wearing?", "hint": "I’m wearing a blue shirt."}, {"n": 138, "q": "Do you like shopping?", "hint": "Yes, I do."}, {"n": 139, "q": "What’s your favorite store?", "hint": "The bookstore."}, {"n": 140, "q": "How much money do you have?", "hint": "I have enough."}, {"n": 141, "q": "Did you enjoy the party?", "hint": "Yes, it was amazing."}, {"n": 142, "q": "Who invited you?", "hint": "My cousin invited me."}, {"n": 143, "q": "Are you free this evening?", "hint": "Yes, I am."}, {"n": 144, "q": "Would you like to join us?", "hint": "I’d love to."}, {"n": 145, "q": "What’s your favorite song?", "hint": "My favorite song is “Perfect.”"}, {"n": 146, "q": "Can you sing?", "hint": "Yes, a little."}, {"n": 147, "q": "What makes you happy?", "hint": "Spending time with my family."}, {"n": 148, "q": "Do you believe in yourself?", "hint": "Yes, I do."}, {"n": 149, "q": "What’s your biggest goal?", "hint": "To live a successful life."}, {"n": 150, "q": "See you tomorrow!", "hint": "See you. Take care!"}, {"n": 151, "q": "What are you doing this weekend?", "hint": "I’m visiting my grandparents."}, {"n": 152, "q": "Do you have any plans tonight?", "hint": "Yes, I’m meeting my friends."}, {"n": 153, "q": "Can you recommend a good movie?", "hint": "Sure, watch “The Pursuit of Happyness.”"}, {"n": 154, "q": "What’s your favorite animal?", "hint": "My favorite animal is the tiger."}, {"n": 155, "q": "Do you like the beach?", "hint": "Yes, I love it."}, {"n": 156, "q": "Have you finished your work?", "hint": "Yes, I finished it."}, {"n": 157, "q": "Can you lend me some money?", "hint": "Sure, no problem."}, {"n": 158, "q": "What do you usually do after work?", "hint": "I relax and watch TV."}, {"n": 159, "q": "Are you excited?", "hint": "Yes, very excited."}, {"n": 160, "q": "What did you learn today?", "hint": "I learned something new."}, {"n": 161, "q": "Can you tell me the truth?", "hint": "Of course."}, {"n": 162, "q": "Do you trust me?", "hint": "Yes, I do."}, {"n": 163, "q": "What are you afraid of?", "hint": "I’m afraid of heights."}, {"n": 164, "q": "Can I use your charger?", "hint": "Yes, go ahead."}, {"n": 165, "q": "What’s your favorite app?", "hint": "My favorite app is Instagram."}, {"n": 166, "q": "How often do you travel?", "hint": "Twice a year."}, {"n": 167, "q": "Have you ever flown on a plane?", "hint": "Yes, many times."}, {"n": 168, "q": "What’s your favorite city?", "hint": "My favorite city is Dubai."}, {"n": 169, "q": "Do you enjoy photography?", "hint": "Yes, I do."}, {"n": 170, "q": "Can you play the guitar?", "hint": "No, I can’t."}, {"n": 171, "q": "What’s your dream destination?", "hint": "Switzerland."}, {"n": 172, "q": "Are you ready to order?", "hint": "Yes, I am."}, {"n": 173, "q": "Would you like some dessert?", "hint": "Yes, please."}, {"n": 174, "q": "Is there anything else?", "hint": "No, that’s all."}, {"n": 175, "q": "Can I pay by card?", "hint": "Yes, you can."}, {"n": 176, "q": "Do you have Wi-Fi?", "hint": "Yes, we do."}, {"n": 177, "q": "What’s the Wi-Fi password?", "hint": "It’s written on the menu."}, {"n": 178, "q": "Can you speak louder?", "hint": "Sure."}, {"n": 179, "q": "Did you enjoy your vacation?", "hint": "Yes, it was wonderful."}, {"n": 180, "q": "Where did you stay?", "hint": "I stayed at a hotel."}, {"n": 181, "q": "How was the food?", "hint": "It was delicious."}, {"n": 182, "q": "What’s your favorite hobby?", "hint": "Reading books."}, {"n": 183, "q": "Can you keep a secret?", "hint": "Yes, I can."}, {"n": 184, "q": "What are you smiling about?", "hint": "I just remembered something funny."}, {"n": 185, "q": "Are you feeling sleepy?", "hint": "Yes, a little."}, {"n": 186, "q": "Do you need a break?", "hint": "Yes, I do."}, {"n": 187, "q": "Can I ask for your advice?", "hint": "Of course."}, {"n": 188, "q": "What do you think?", "hint": "I think it’s a great idea."}, {"n": 189, "q": "Do you agree with me?", "hint": "Yes, I completely agree."}, {"n": 190, "q": "What would you do?", "hint": "I’d stay calm."}, {"n": 191, "q": "Can you forgive me?", "hint": "Yes, I forgive you."}, {"n": 192, "q": "Are you serious?", "hint": "Yes, I am."}, {"n": 193, "q": "What’s your biggest dream?", "hint": "To travel the world."}, {"n": 194, "q": "Do you believe in hard work?", "hint": "Yes, absolutely."}, {"n": 195, "q": "What’s your life motto?", "hint": "Never give up."}, {"n": 196, "q": "Are you happy with your life?", "hint": "Yes, I am."}, {"n": 197, "q": "What inspires you?", "hint": "Successful people."}, {"n": 198, "q": "Can we be friends?", "hint": "Of course!"}, {"n": 199, "q": "Will you help me again?", "hint": "Anytime."}, {"n": 200, "q": "Thank you for your help.", "hint": "You’re welcome!"}];
+const TOTAL = ITEMS.length;
+const answers = Array(TOTAL).fill("");
+let current = 0;
+let startTime = null;
+let timerId = null;
+let submitted = false;
+const storeKey = "conversation_writing_dossier_200_v1";
+
+const $ = id => document.getElementById(id);
+const qgrid = $("qgrid"), rangebar = $("rangebar"), answerBox = $("answer");
+
+function fmt(sec) {
+  sec = Math.max(0, Math.floor(sec || 0));
+  const h = Math.floor(sec/3600), m = Math.floor((sec%3600)/60), s = sec%60;
+  return h ? `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`
+           : `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+}
+function ensureTimer() {
+  if(startTime) return;
+  startTime = Date.now();
+  timerId = setInterval(updateTimer,1000);
+  updateTimer();
+}
+function updateTimer() {
+  $("timerChip").textContent = fmt(startTime ? (Date.now()-startTime)/1000 : 0);
+}
+function answeredCount() { return answers.filter(x => x.trim()).length; }
+
+function saveCurrent() {
+  answers[current] = answerBox.value;
+  updateDots();
+  updateStats();
+  saveState();
+}
+function renderCurrent() {
+  const item = ITEMS[current];
+  $("qno").textContent = `Question ${item.n}`;
+  $("qrange").textContent = `${Math.floor(current/50)*50+1}–${Math.floor(current/50)*50+50}`;
+  $("question").textContent = item.q;
+  answerBox.value = answers[current];
+  $("status").textContent = `${current+1} / ${TOTAL}`;
+  $("prevBtn").disabled = current === 0;
+  $("nextBtn").textContent = current === TOTAL-1 ? "Finish section" : "Next";
+  document.querySelectorAll(".qdot").forEach((b,i)=>b.classList.toggle("active",i===current));
+  document.querySelectorAll(".rangebtn").forEach((b,i)=>b.classList.toggle("active",i===Math.floor(current/50)));
+}
+function goTo(i) {
+  saveCurrent();
+  current = Math.max(0,Math.min(TOTAL-1,i));
+  renderCurrent();
+  $("workspace").scrollIntoView({behavior:"smooth",block:"start"});
+  answerBox.focus();
+}
+function updateDots() {
+  document.querySelectorAll(".qdot").forEach((b,i)=>b.classList.toggle("done",!!answers[i].trim()));
+}
+function updateStats() {
+  $("answeredChip").textContent = `Answered ${answeredCount()}/${TOTAL}`;
+}
+function buildNav() {
+  for(let r=0;r<4;r++) {
+    const btn=document.createElement("button");
+    btn.className="rangebtn";
+    btn.textContent=`${r*50+1}–${r*50+50}`;
+    btn.onclick=()=>goTo(r*50);
+    rangebar.appendChild(btn);
+  }
+  ITEMS.forEach((item,i)=>{
+    const b=document.createElement("button");
+    b.className="qdot";
+    b.textContent=item.n;
+    b.onclick=()=>goTo(i);
+    qgrid.appendChild(b);
+  });
+}
+function firstBlank() {
+  saveCurrent();
+  const i=answers.findIndex(x=>!x.trim());
+  if(i===-1) return alert("All 200 questions have an answer.");
+  goTo(i);
+}
+function saveState() {
+  localStorage.setItem(storeKey,JSON.stringify({
+    name:$("studentName").value,
+    cls:$("studentClass").value,
+    answers,startTime,current
+  }));
+}
+function loadState() {
+  try {
+    const data=JSON.parse(localStorage.getItem(storeKey)||"null");
+    if(!data) return;
+    $("studentName").value=data.name||"";
+    $("studentClass").value=data.cls||"";
+    if(Array.isArray(data.answers)) data.answers.slice(0,TOTAL).forEach((v,i)=>answers[i]=v||"");
+    if(Number.isInteger(data.current)) current=Math.max(0,Math.min(TOTAL-1,data.current));
+    if(data.startTime) {
+      startTime=data.startTime;
+      timerId=setInterval(updateTimer,1000);
+    }
+  } catch(e) {}
+}
+function submit() {
+  saveCurrent();
+  if(!$("studentName").value.trim()) {
+    alert("Please enter the student's name.");
+    $("studentName").focus();
+    return;
+  }
+  ensureTimer();
+  submitted=true;
+  const elapsed=(Date.now()-startTime)/1000;
+  const count=answeredCount();
+  $("mAnswered").textContent=count;
+  $("mBlank").textContent=TOTAL-count;
+  $("mTime").textContent=fmt(elapsed);
+  $("reportMeta").innerHTML =
+    `<strong>Student:</strong> ${escapeHtml($("studentName").value.trim())}<br>`+
+    `<strong>Class / Group:</strong> ${escapeHtml($("studentClass").value.trim()||"—")}<br>`+
+    `<strong>Submitted:</strong> ${new Date().toLocaleString()}<br>`+
+    `<strong>Completion:</strong> ${count} / ${TOTAL} prompts`;
+  const frag=document.createDocumentFragment();
+  $("reportlist").innerHTML="";
+  ITEMS.forEach((it,i)=>{
+    const box=document.createElement("article");
+    box.className="reportitem";
+    const student=answers[i].trim();
+    box.innerHTML=
+      `<div class="reportq">${it.n}. ${escapeHtml(it.q)}</div>`+
+      `<div class="label">Student response</div>`+
+      `<div class="studentans${student?"":" blank"}">${student?escapeHtml(student):"No response submitted."}</div>`+
+      `<div class="label">Suggested response</div>`+
+      `<div class="hintans">${escapeHtml(it.hint)}</div>`;
+    frag.appendChild(box);
+  });
+  $("reportlist").appendChild(frag);
+  $("postsubmit").classList.add("open");
+  $("postsubmit").scrollIntoView({behavior:"smooth",block:"start"});
+  saveState();
+}
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]));
+}
+function resetAll() {
+  if(!confirm("Delete all answers and restart the dossier?")) return;
+  localStorage.removeItem(storeKey);
+  answers.fill("");
+  current=0; startTime=null; submitted=false;
+  if(timerId) clearInterval(timerId);
+  timerId=null;
+  $("studentName").value="";
+  $("studentClass").value="";
+  $("postsubmit").classList.remove("open");
+  updateTimer(); updateDots(); updateStats(); renderCurrent();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+answerBox.addEventListener("focus",ensureTimer);
+answerBox.addEventListener("input",()=>{ answers[current]=answerBox.value; updateDots(); updateStats(); saveState(); });
+answerBox.addEventListener("keydown",e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key==="Enter") { e.preventDefault(); goTo(current+1); }
+});
+$("prevBtn").onclick=()=>goTo(current-1);
+$("nextBtn").onclick=()=>goTo(Math.min(TOTAL-1,current+1));
+$("saveBtn").onclick=()=>{saveCurrent();alert("Progress saved on this browser.");};
+$("firstBlankBtn").onclick=firstBlank;
+$("submitBtn").onclick=submit;
+$("resetBtn").onclick=resetAll;
+$("printBtn").onclick=()=>window.print();
+$("backBtn").onclick=()=>$("workspace").scrollIntoView({behavior:"smooth",block:"start"});
+["studentName","studentClass"].forEach(id=>$(id).addEventListener("input",saveState));
+
+buildNav();
+loadState();
+updateDots(); updateStats(); updateTimer(); renderCurrent();
+</script>
+</body>
+</html>
